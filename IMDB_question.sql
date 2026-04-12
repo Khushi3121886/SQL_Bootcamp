@@ -392,11 +392,30 @@ Let’s begin by searching for null values in the tables.*/
 +---------------+-------------------+---------------------+----------------------+*/
 -- Type your code below:
 
+use imdb;
+SELECT 
+	SUM(CASE WHEN ID IS NULL THEN 1 ELSE 0 END) AS ID_NULLS,
+	SUM(CASE WHEN NAME IS NULL THEN 1 ELSE 0 END) AS NAME_NULLS,
+	SUM(CASE WHEN HEIGHT IS NULL THEN 1 ELSE 0 END) AS HEIGHT_NULLS,
+	SUM(CASE WHEN DATE_OF_BIRTH IS NULL THEN 1 ELSE 0 END) AS DATE_OF_BIRTH_NULLS,
+	SUM(CASE WHEN KNOWN_FOR_MOVIES IS NULL THEN 1 ELSE 0 END) AS KNOWN_FOR_MOVIES_NULLS
+FROM NAMES;
 
+SELECT 
+    SUM(ID IS NULL) AS ID_NULLS,
+    SUM(NAME IS NULL) AS NAME_NULLS,
+    SUM(HEIGHT IS NULL) AS HEIGHT_NULLS,
+    SUM(DATE_OF_BIRTH IS NULL) AS DATE_OF_BIRTH_NULLS,
+    SUM(KNOWN_FOR_MOVIES IS NULL) AS KNOWN_FOR_MOVIES_NULLS
+FROM NAMES;
 
-
-
-
+SELECT 
+    COUNT(*) - COUNT(ID) AS ID_NULLS,
+    COUNT(*) - COUNT(NAME) AS NAME_NULLS,
+    COUNT(*) - COUNT(HEIGHT) AS HEIGHT_NULLS,
+    COUNT(*) - COUNT(DATE_OF_BIRTH) AS DATE_OF_BIRTH_NULLS,
+    COUNT(*) - COUNT(KNOWN_FOR_MOVIES) AS KNOWN_FOR_MOVIES_NULLS
+FROM NAMES;
 
 
 /* There are no Null value in the column 'name'.
@@ -416,8 +435,19 @@ Let’s find out the top three directors in the top three genres who can be hire
 +---------------+-------------------+ */
 -- Type your code below:
 
-
-
+select name as director_name, count(n.id) as movie_count, genre
+from movies as m
+join director_mapping as d
+on n.id = d.name_id
+join movie as m
+on n.movie_count = m.id
+join ratings as r
+on m.id = r.movie_id
+join genre as g
+on m.id = g.movie_id
+where avg_rating > 8
+group by genre
+limit 3
 
 
 
@@ -437,13 +467,18 @@ Now, let’s find out the top two actors.*/
 |	.			|		.			|
 +---------------+-------------------+ */
 -- Type your code below:
-
-
-
-
-
-
-
+select name as actor_name, count(m.id) as movie_count
+from movie as m
+join ratings as r
+on m.id = r.movie_id
+join role_mapping as rm
+on m.id = rm.movie_id
+join names as n
+on rm.name_id = n.id
+where median_rating >=8 and category = "actor"
+group by name
+order by count(m.id) desc
+limit 2
 
 /* Have you find your favourite actor 'Mohanlal' in the list. If no, please check your code again. 
 RSVP Movies plans to partner with other global production houses. 
